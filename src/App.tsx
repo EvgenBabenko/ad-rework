@@ -42,6 +42,7 @@ export const App = () => {
   const phoneContainerRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const sliderTextRef = useRef<HTMLDivElement>(null);
+  const highlightsRef = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLInputElement>(null);
   const [sliderValue, setSliderValue] = useState(0);
   const raining = useRef(false);
@@ -63,9 +64,9 @@ export const App = () => {
     };
   }, []);
 
-  useEffect(() => {
-    animationSelector(sliderValue);
-  }, [sliderValue]);
+  // useEffect(() => {
+  //   animationSelector(sliderValue);
+  // }, [sliderValue]);
 
   // useEffect(() => {
   //   isRainingRef.current = isRaining;
@@ -105,9 +106,12 @@ export const App = () => {
     // internalsFrameRef.current!.style.opacity = "0";
     internalsRef.current!.style.opacity = "0";
     internalsRef.current!.style.transition = "0s";
+    highlightsRef.current!.style.opacity = "0";
 
     if (value === 0) {
       setPlaying(true);
+
+      highlightsRef.current!.style.opacity = "1";
     }
 
     if (value >= 1) {
@@ -154,6 +158,8 @@ export const App = () => {
     const position = `-${value * FRAME_HEIGHT}px`;
 
     spriteRef.current!.style.backgroundPositionY = position;
+
+    animationSelector(value);
   };
 
   const close = () => {
@@ -258,10 +264,7 @@ export const App = () => {
   };
 
   const followTo = () => {
-    window.open(
-      "https://www.youtube.com/watch?v=v4mckcfr4c0&ab_channel=SamsungPhilippines",
-      "_blank"
-    );
+    window.open("", "_blank");
   };
 
   // TODO: load all resources and start working after all loaded
@@ -279,7 +282,7 @@ export const App = () => {
 
       <div className="phone-container" ref={phoneContainerRef}>
         <div className="sprite" ref={spriteRef} />
-        <div className="highlights" />
+        <div className="highlights" ref={highlightsRef} />
         <ReactPlayer
           url="https://www.youtube.com/watch?v=v4mckcfr4c0&ab_channel=SamsungPhilippines"
           className="yt-player"
