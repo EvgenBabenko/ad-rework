@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import "./App.css";
 import text_1 from "assets/img/text_1.png?url";
@@ -9,6 +9,22 @@ import closeImage from "assets/img/close_black.png";
 import { Rain } from "modules/rain";
 import { RainDrop } from "modules/rain-drop";
 import { delay } from "utils/delay";
+
+const initProgress = (start: number, end: number, duration: number) => {
+  let startTime = 0;
+
+  return (timestamp: number) => {
+    if (!startTime) {
+      startTime = timestamp;
+    }
+
+    const elapsed = timestamp - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const current = start + (end - start) * progress;
+
+    return { current, progress };
+  };
+};
 
 const FRAMES = 58;
 const FRAME_HEIGHT = 221;
@@ -98,7 +114,7 @@ export const App = () => {
       setPlaying(false);
     }
 
-    if (value >= 3 && value < 26) {
+    if (value >= 3 && value < 22) {
       textRef.current!.style.backgroundImage = `url(${text_2})`;
 
       // rain.start();
@@ -106,7 +122,7 @@ export const App = () => {
       // setInterval(() => setIsRaining(false), 10_000);
     }
 
-    if (value >= 26 && value < 43) {
+    if (value >= 22 && value < 45) {
       textRef.current!.style.backgroundImage = `url(${text_3})`;
       // setIsRaining(false);
     }
@@ -116,7 +132,7 @@ export const App = () => {
       turnFlash();
     }
 
-    if (value >= 43) {
+    if (value >= 45) {
       textRef.current!.style.backgroundImage = `url(${text_4})`;
     }
 
@@ -135,34 +151,22 @@ export const App = () => {
 
     setSliderValue(value);
 
-    const positionY = `-${value * FRAME_HEIGHT}px`;
+    const position = `-${value * FRAME_HEIGHT}px`;
 
-    spriteRef.current!.style.backgroundPositionY = positionY;
+    spriteRef.current!.style.backgroundPositionY = position;
   };
 
   const close = () => {
-    if (mainRef.current) {
-      mainRef.current.remove();
-    }
+    mainRef.current?.remove();
   };
 
   function highlightCard() {
-    const startX = 0;
-    const endX = 250;
-    const duration = 600;
-
-    let startTime = 0;
+    const getProgress = initProgress(0, 250, 600);
 
     function animate(timestamp: number) {
-      if (!startTime) {
-        startTime = timestamp;
-      }
+      const { current: x, progress } = getProgress(timestamp);
 
-      const elapsed = timestamp - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const currentX = startX + (endX - startX) * progress;
-
-      cardHighlightRef.current!.style.transform = `rotate(-15deg) translateX(${currentX}px)`;
+      cardHighlightRef.current!.style.transform = `rotate(-15deg) translateX(${x}px)`;
 
       if (progress < 1) {
         requestAnimationFrame(animate);
@@ -180,22 +184,12 @@ export const App = () => {
     hasFlash.current = true;
     flashRef.current!.classList.add("flash");
 
-    const startScale = 0.3;
-    const endScale = 2.5;
-    const duration = 200;
-
-    let startTime = 0;
+    const getProgress = initProgress(0.3, 2.5, 200);
 
     function animate(timestamp: number) {
-      if (!startTime) {
-        startTime = timestamp;
-      }
+      const { current: scale, progress } = getProgress(timestamp);
 
-      const elapsed = timestamp - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const currentScale = startScale + (endScale - startScale) * progress;
-
-      flashRef.current!.style.transform = `scale(${currentScale})`;
+      flashRef.current!.style.transform = `scale(${scale})`;
 
       if (progress < 1) {
         requestAnimationFrame(animate);
@@ -210,22 +204,12 @@ export const App = () => {
 
   const slidingPhone = (): Promise<void> => {
     return new Promise((resolve) => {
-      const startY = 250;
-      const endY = 0;
-      const duration = 500;
-
-      let startTime = 0;
+      const getProgress = initProgress(250, 0, 500);
 
       function animate(timestamp: number) {
-        if (!startTime) {
-          startTime = timestamp;
-        }
+        const { current: y, progress } = getProgress(timestamp);
 
-        const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const currentY = startY + (endY - startY) * progress;
-
-        phoneContainerRef.current!.style.transform = `translatey(${currentY}px)`;
+        phoneContainerRef.current!.style.transform = `translateY(${y}px)`;
 
         if (progress < 1) {
           requestAnimationFrame(animate);
@@ -240,22 +224,12 @@ export const App = () => {
 
   const slidingSlider = (): Promise<void> => {
     return new Promise((resolve) => {
-      const startX = 250;
-      const endX = 0;
-      const duration = 600;
-
-      let startTime = 0;
+      const getProgress = initProgress(250, 0, 600);
 
       function animate(timestamp: number) {
-        if (!startTime) {
-          startTime = timestamp;
-        }
+        const { current: x, progress } = getProgress(timestamp);
 
-        const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const currentX = startX + (endX - startX) * progress;
-
-        sliderRef.current!.style.transform = `rotate(90deg) translateX(${currentX}px)`;
+        sliderRef.current!.style.transform = `rotate(90deg) translateX(${x}px)`;
 
         if (progress < 1) {
           requestAnimationFrame(animate);
@@ -270,7 +244,7 @@ export const App = () => {
 
   const onPlayerReady = () => {
     slidingPhone()
-      .then(() => {
+      .then(async () => {
         setPlaying(true);
         textRef.current!.style.backgroundImage = `url(${text_1})`;
       })
@@ -283,13 +257,22 @@ export const App = () => {
       });
   };
 
+  const followTo = () => {
+    window.open(
+      "https://www.youtube.com/watch?v=v4mckcfr4c0&ab_channel=SamsungPhilippines",
+      "_blank"
+    );
+  };
+
+  // TODO: load all resources and start working after all loaded
+
   return (
     <div className="main" ref={mainRef}>
       <div className="close" onClick={close}>
         <span>Close Ad</span>
         <img src={closeImage} alt="close" />
       </div>
-      <div className="followTo" onClick={() => window.open()} />
+      <div className="followTo" onClick={followTo} />
       <div className="logo" />
       <div className="text" ref={textRef} />
       <div className="cta" ref={ctaRef} />
