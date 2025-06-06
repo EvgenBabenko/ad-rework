@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import ReactPlayer from "react-player";
+import ReactPlayer from "react-player/youtube";
 import "./App.css";
 import text_1 from "assets/img/text_1.png?url";
 import text_2 from "assets/img/text_2.png?url";
@@ -56,7 +56,7 @@ export const App = () => {
 
   useEffect(() => {
     return () => {
-      clearInterval(cardHighlighID.current);
+      clearTimeout(cardHighlighID.current);
     };
   }, []);
 
@@ -122,7 +122,6 @@ export const App = () => {
       setIsRaining(false);
     }
 
-    // TODO: add range and check for at least 1 flash in range
     if (value === 30) {
       turnFlash();
     }
@@ -257,8 +256,6 @@ export const App = () => {
   const followTo = () => {
     window.open("", "_blank");
   };
-
-  // TODO: load all resources and start working after all loaded
 
   return (
     <div className="main" ref={mainRef}>
