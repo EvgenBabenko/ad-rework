@@ -6,19 +6,18 @@ import text_2 from "assets/img/text_2.png?url";
 import text_3 from "assets/img/text_3.png?url";
 import text_4 from "assets/img/text_4.png?url";
 import closeImage from "assets/img/close_black.png";
-import { Rain } from "modules/rain";
 import { RainDrop } from "modules/rain-drop";
 import { delay } from "utils/delay";
 
-const initProgress = (start: number, end: number, duration: number) => {
+const animationProgress = (start: number, end: number, duration: number) => {
   let startTime = 0;
 
-  return (timestamp: number) => {
+  return (time: number) => {
     if (!startTime) {
-      startTime = timestamp;
+      startTime = time;
     }
 
-    const elapsed = timestamp - startTime;
+    const elapsed = time - startTime;
     const progress = Math.min(elapsed / duration, 1);
     const current = start + (end - start) * progress;
 
@@ -28,8 +27,7 @@ const initProgress = (start: number, end: number, duration: number) => {
 
 const FRAMES = 58;
 const FRAME_HEIGHT = 221;
-const MAX_DROPS = 15;
-const SPAWN_DELAY = 80;
+const MAX_DROPS = 100;
 
 export const App = () => {
   const mainRef = useRef<HTMLDivElement>(null);
@@ -45,7 +43,6 @@ export const App = () => {
   const highlightsRef = useRef<HTMLDivElement>(null);
   const sliderRef = useRef<HTMLInputElement>(null);
   const [sliderValue, setSliderValue] = useState(0);
-  const raining = useRef(false);
   const hasFlash = useRef(false);
   const cardHighlighID = useRef(0);
   const [drops, setDrops] = useState<RainDrop[]>([]);
@@ -53,10 +50,9 @@ export const App = () => {
   const lastSpawnTime = useRef(0);
   const animationFrameId = useRef(0);
   const [isRaining, setIsRaining] = useState(false);
-  const isRainingRef = useRef(isRaining);
   const [playing, setPlaying] = useState(false);
 
-  console.log(drops);
+  console.log(dropsRef.current.length);
 
   useEffect(() => {
     return () => {
@@ -64,44 +60,36 @@ export const App = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   animationSelector(sliderValue);
-  // }, [sliderValue]);
+  useEffect(() => {
+    const animate = (time: number) => {
+      if (isRaining && dropsRef.current.length < MAX_DROPS) {
+        const drop = new RainDrop();
+        dropsRef.current.push(drop);
+        lastSpawnTime.current = time;
+      }
 
-  // useEffect(() => {
-  //   isRainingRef.current = isRaining;
-  // }, [isRaining]);
+      dropsRef.current.forEach((drop) => drop.update());
+      dropsRef.current = dropsRef.current.filter((drop) => drop.active);
 
-  // useEffect(() => {
-  //   const animate = (time: number) => {
-  //     if (
-  //       isRainingRef.current &&
-  //       dropsRef.current.length < MAX_DROPS &&
-  //       time - lastSpawnTime.current > SPAWN_DELAY
-  //     ) {
-  //       const drop = RainDrop.getInstance();
-  //       dropsRef.current.push(drop);
-  //       lastSpawnTime.current = time;
-  //     }
+      setDrops([...dropsRef.current]);
 
-  //     dropsRef.current.forEach((drop) => drop.update());
-  //     dropsRef.current = dropsRef.current.filter((drop) => drop.active);
+      if (!dropsRef.current.length) {
+        cancelAnimationFrame(animationFrameId.current);
 
-  //     setDrops([...dropsRef.current]);
+        return;
+      }
 
-  //     animationFrameId.current = requestAnimationFrame(animate);
-  //   };
+      animationFrameId.current = requestAnimationFrame(animate);
+    };
 
-  //   animationFrameId.current = requestAnimationFrame(animate);
+    animationFrameId.current = requestAnimationFrame(animate);
 
-  //   return () => {
-  //     cancelAnimationFrame(animationFrameId.current);
-  //   };
-  // }, []);
+    return () => {
+      cancelAnimationFrame(animationFrameId.current);
+    };
+  }, [isRaining]);
 
   const animationSelector = (value: number) => {
-    const rain = new Rain(rainRef, 100, 50);
-
     textRef.current!.style.backgroundImage = `url(${text_1})`;
     // internalsFrameRef.current!.style.opacity = "0";
     internalsRef.current!.style.opacity = "0";
@@ -112,23 +100,26 @@ export const App = () => {
       setPlaying(true);
 
       highlightsRef.current!.style.opacity = "1";
+      setIsRaining(false);
     }
 
     if (value >= 1) {
       setPlaying(false);
+      setIsRaining(true);
     }
 
     if (value >= 3 && value < 22) {
       textRef.current!.style.backgroundImage = `url(${text_2})`;
 
       // rain.start();
-      // setIsRaining(true);
+      setIsRaining(true);
       // setInterval(() => setIsRaining(false), 10_000);
+      // rainingNext();
     }
 
     if (value >= 22 && value < 45) {
       textRef.current!.style.backgroundImage = `url(${text_3})`;
-      // setIsRaining(false);
+      setIsRaining(false);
     }
 
     // TODO: add range and check for at least 1 flash in range
@@ -167,10 +158,10 @@ export const App = () => {
   };
 
   function highlightCard() {
-    const getProgress = initProgress(0, 250, 600);
+    const getProgress = animationProgress(0, 250, 600);
 
-    function animate(timestamp: number) {
-      const { current: x, progress } = getProgress(timestamp);
+    function animate(time: number) {
+      const { current: x, progress } = getProgress(time);
 
       cardHighlightRef.current!.style.transform = `rotate(-15deg) translateX(${x}px)`;
 
@@ -190,10 +181,10 @@ export const App = () => {
     hasFlash.current = true;
     flashRef.current!.classList.add("flash");
 
-    const getProgress = initProgress(0.3, 2.5, 200);
+    const getProgress = animationProgress(0.3, 2.5, 200);
 
-    function animate(timestamp: number) {
-      const { current: scale, progress } = getProgress(timestamp);
+    function animate(time: number) {
+      const { current: scale, progress } = getProgress(time);
 
       flashRef.current!.style.transform = `scale(${scale})`;
 
@@ -210,10 +201,10 @@ export const App = () => {
 
   const slidingPhone = (): Promise<void> => {
     return new Promise((resolve) => {
-      const getProgress = initProgress(250, 0, 500);
+      const getProgress = animationProgress(250, 0, 500);
 
-      function animate(timestamp: number) {
-        const { current: y, progress } = getProgress(timestamp);
+      function animate(time: number) {
+        const { current: y, progress } = getProgress(time);
 
         phoneContainerRef.current!.style.transform = `translateY(${y}px)`;
 
@@ -230,10 +221,10 @@ export const App = () => {
 
   const slidingSlider = (): Promise<void> => {
     return new Promise((resolve) => {
-      const getProgress = initProgress(250, 0, 600);
+      const getProgress = animationProgress(250, 0, 600);
 
-      function animate(timestamp: number) {
-        const { current: x, progress } = getProgress(timestamp);
+      function animate(time: number) {
+        const { current: x, progress } = getProgress(time);
 
         sliderRef.current!.style.transform = `rotate(90deg) translateX(${x}px)`;
 

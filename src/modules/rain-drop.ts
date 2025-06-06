@@ -1,6 +1,7 @@
 export class RainDrop {
-  static pool: RainDrop[] = [];
+  // static pool: RainDrop[] = [];
 
+  /** unique id */
   id: string = "";
   className: string = "";
   scale: number = 0;
@@ -16,7 +17,7 @@ export class RainDrop {
   }
 
   reset() {
-    this.id = Math.random().toString(36).slice(2); // Unique ID
+    this.id = Math.random().toString(36).slice(2);
     this.className = "raindrop_" + Math.floor(this.random(1, 4));
     this.scale = this.random(5, 7);
     this.opacity = 0;
@@ -50,23 +51,19 @@ export class RainDrop {
     // this is sliding
     this.translateY += this.slipDownSpeed;
 
-    if (this.translateY >= 255) {
+    if (this.translateY >= 250) {
       this.active = false;
+      // RainDrop.pool.push(this); // return to pool
     }
   }
-
-  // destroy() {
-  //   this.active = false;
-  //   RainDrop.pool.push(this);
-  // }
 
   random(min: number, max: number) {
     return Math.random() * (max - min) + min;
   }
 
-  static getInstance(): RainDrop {
-    return RainDrop.pool.length > 0
-      ? (RainDrop.pool.pop() as RainDrop)
-      : new RainDrop();
-  }
+  // static getInstance(): RainDrop {
+  //   return RainDrop.pool.length > 0
+  //     ? (RainDrop.pool.pop() as RainDrop)
+  //     : new RainDrop();
+  // }
 }
