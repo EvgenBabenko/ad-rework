@@ -388,6 +388,7 @@ export const App = () => {
       <input
         ref={sliderRef}
         className="slider"
+        aria-label="slider"
         type="range"
         min="0"
         max={FRAMES}
