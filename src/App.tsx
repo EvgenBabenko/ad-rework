@@ -1,20 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player/youtube";
 import "./App.css";
-import text_1 from "assets/img/text_1.png?url";
-import text_2 from "assets/img/text_2.png?url";
-import text_3 from "assets/img/text_3.png?url";
-import text_4 from "assets/img/text_4.png?url";
-import closeImage from "assets/img/close_black.png?url";
-import logo from "assets/img/logo.png?url";
-import loading from "assets/img/loading.jpg?url";
-import slider_text from "assets/img/slider_text.png?url";
-import highlights_970x250 from "assets/img/970x250_highlights.png?url";
-import cta from "assets/img/cta.png?url";
-import internals_frame from "assets/img/internals_frame.png?url";
+import text_1 from "assets/img-webp/text_1.webp?url";
+import text_2 from "assets/img-webp/text_2.webp?url";
+import text_3 from "assets/img-webp/text_3.webp?url";
+import text_4 from "assets/img-webp/text_4.webp?url";
+import closeImage from "assets/img-webp/close_black.webp?url";
+import logo from "assets/img-webp/logo.webp?url";
+import loading from "assets/img-webp/loading.webp?url";
+import slider_text from "assets/img-webp/slider_text.webp?url";
+import highlights_970x250 from "assets/img-webp/970x250_highlights.webp?url";
+import cta from "assets/img-webp/cta.webp?url";
+import internals_frame from "assets/img-webp/internals_frame.webp?url";
 import internals from "assets/img-webp/internals.webp?url";
-import card_highlight from "assets/img/card_highlight.png?url";
-import phone_sprite from "assets/img-webp/phone_sprite.webp?url";
 import flash from "assets/img-webp/flash.webp?url";
 import { RainDrop } from "modules/rain-drop";
 import { delay } from "utils/delay";
@@ -37,6 +35,9 @@ const animationProgress = (start: number, end: number, duration: number) => {
   };
 };
 
+const BANNER_WIDTH = 970;
+const BANNER_HEIGHT = 250;
+
 const FRAMES = 58;
 const FRAME_HEIGHT = 221;
 const MAX_DROPS = 25;
@@ -46,28 +47,30 @@ export const App = () => {
   preload(logo, { as: "image", fetchPriority: "high" });
 
   preload(flash, { as: "image" });
+  preload(text_1, { as: "image" });
+  preload(text_2, { as: "image" });
+  preload(text_3, { as: "image" });
+  preload(text_4, { as: "image" });
 
   const mainRef = useRef<HTMLDivElement>(null);
-  const [visibleTextClass, setVisibleTextClass] = useState("");
-  const [phoneSpriteBackgroundPositionY, setPhoneSpriteBackgroundPositionY] =
-    useState(0);
+  const textRef = useRef<HTMLDivElement>(null);
+  const phoneSpriteRef = useRef<HTMLDivElement>(null);
   const flashRef = useRef<HTMLDivElement>(null);
   const [isVisibleInternalsContainer, setIsVisibleInternalsContainer] =
     useState(false);
   const cardHighlightRef = useRef<HTMLDivElement>(null);
-  const [phoneContainerTransform, setPhoneContainerTransform] = useState("");
+  const phoneContainerRef = useRef<HTMLDivElement>(null);
   const [isVisibleCta, setIsVisibleCta] = useState(false);
   const [isVisibleSliderText, setIsVisibleSliderText] = useState(false);
   const [isVisibleHighlights_970x250, setIsVisibleHighlights_970x250] =
     useState(false);
   const sliderRef = useRef<HTMLInputElement>(null);
   const [sliderValue, setSliderValue] = useState(0);
-  const hasFlash = useRef(false);
+  const [hasFlash, setHasFlash] = useState(false);
   const cardHighlighID = useRef(0);
   const [drops, setDrops] = useState<RainDrop[]>([]);
   const dropsRef = useRef<RainDrop[]>([]);
   const lastSpawnTime = useRef(0);
-  const animationFrameId = useRef(0);
   const [isRaining, setIsRaining] = useState(false);
   const [playing, setPlaying] = useState(false);
 
@@ -78,6 +81,8 @@ export const App = () => {
   }, []);
 
   useEffect(() => {
+    let animationFrameID: number = 0;
+
     const animate = (time: number) => {
       if (isRaining && dropsRef.current.length < MAX_DROPS) {
         const drop = new RainDrop();
@@ -91,23 +96,25 @@ export const App = () => {
       setDrops([...dropsRef.current]);
 
       if (!dropsRef.current.length) {
-        cancelAnimationFrame(animationFrameId.current);
+        cancelAnimationFrame(animationFrameID);
 
         return;
       }
 
-      animationFrameId.current = requestAnimationFrame(animate);
+      animationFrameID = requestAnimationFrame(animate);
     };
 
-    animationFrameId.current = requestAnimationFrame(animate);
+    animationFrameID = requestAnimationFrame(animate);
 
     return () => {
-      cancelAnimationFrame(animationFrameId.current);
+      cancelAnimationFrame(animationFrameID);
     };
   }, [isRaining]);
 
   const animationSelector = (value: number) => {
-    setVisibleTextClass("text_1");
+    if (textRef.current) {
+      textRef.current.style.backgroundImage = `url(${text_1})`;
+    }
     setIsVisibleInternalsContainer(false);
     setIsVisibleHighlights_970x250(false);
     setIsRaining(false);
@@ -122,13 +129,17 @@ export const App = () => {
     }
 
     if (value >= 3 && value < 22) {
-      setVisibleTextClass("text_2");
+      if (textRef.current) {
+        textRef.current.style.backgroundImage = `url(${text_2})`;
+      }
       setIsRaining(true);
       // setInterval(() => setIsRaining(false), 10_000);
     }
 
     if (value >= 22 && value < 45) {
-      setVisibleTextClass("text_3");
+      if (textRef.current) {
+        textRef.current.style.backgroundImage = `url(${text_3})`;
+      }
     }
 
     if (value === 30) {
@@ -136,7 +147,9 @@ export const App = () => {
     }
 
     if (value >= 45) {
-      setVisibleTextClass("text_4");
+      if (textRef.current) {
+        textRef.current.style.backgroundImage = `url(${text_4})`;
+      }
     }
 
     if (value === FRAMES) {
@@ -151,10 +164,11 @@ export const App = () => {
 
     setSliderValue(value);
 
-    const position = value * -FRAME_HEIGHT;
+    const position = `-${value * FRAME_HEIGHT}px`;
 
-    // spriteRef.current!.style.backgroundPositionY = position;
-    setPhoneSpriteBackgroundPositionY(position);
+    if (phoneSpriteRef.current) {
+      phoneSpriteRef.current.style.backgroundPositionY = position;
+    }
 
     animationSelector(value);
   };
@@ -169,7 +183,9 @@ export const App = () => {
     function animate(time: number) {
       const { current: x, progress } = getProgress(time);
 
-      cardHighlightRef.current!.style.transform = `rotate(-15deg) translateX(${x}px)`;
+      if (cardHighlightRef.current) {
+        cardHighlightRef.current.style.transform = `rotate(-15deg) translateX(${x}px)`;
+      }
 
       if (progress < 1) {
         requestAnimationFrame(animate);
@@ -180,24 +196,25 @@ export const App = () => {
   }
 
   function turnFlash() {
-    if (hasFlash.current) {
+    if (hasFlash) {
       return;
     }
 
-    hasFlash.current = true;
+    setHasFlash(true);
 
     const getProgress = animationProgress(0.3, 2.5, 200);
 
     function animate(time: number) {
       const { current: scale, progress } = getProgress(time);
 
-      flashRef.current!.style.transform = `scale(${scale})`;
+      if (flashRef.current) {
+        flashRef.current.style.transform = `scale(${scale})`;
+      }
 
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        hasFlash.current = false;
-        flashRef.current!.classList.remove("flash");
+        setHasFlash(false);
       }
     }
 
@@ -211,7 +228,9 @@ export const App = () => {
       function animate(time: number) {
         const { current: y, progress } = getProgress(time);
 
-        setPhoneContainerTransform(`translateY(${y}px)`);
+        if (phoneContainerRef.current) {
+          phoneContainerRef.current.style.transform = `translateY(${y}px)`;
+        }
 
         if (progress < 1) {
           requestAnimationFrame(animate);
@@ -231,7 +250,9 @@ export const App = () => {
       function animate(time: number) {
         const { current: x, progress } = getProgress(time);
 
-        sliderRef.current!.style.transform = `rotate(90deg) translateX(${x}px)`;
+        if (sliderRef.current) {
+          sliderRef.current.style.transform = `rotate(90deg) translateX(${x}px)`;
+        }
 
         if (progress < 1) {
           requestAnimationFrame(animate);
@@ -250,11 +271,19 @@ export const App = () => {
     slidingPhone()
       .then(async () => {
         setPlaying(true);
-        setVisibleTextClass("text_1");
+
+        if (textRef.current) {
+          textRef.current.style.opacity = "1";
+          textRef.current.style.backgroundImage = `url(${text_1})`;
+          textRef.current.style.transition = "1s ease-in-out";
+        }
       })
       .then(() => delay(900))
       .then(() => slidingSlider())
       .then(async () => {
+        if (textRef.current) {
+          textRef.current.style.transition = "0.3s ease";
+        }
         setIsVisibleSliderText(true);
         await delay(1000);
         setIsVisibleCta(true);
@@ -280,38 +309,7 @@ export const App = () => {
       </div>
       <div className="followTo" onClick={followTo} />
       <img src={logo} alt="logo" width={970} height={250} className="logo" />
-      <img
-        src={text_1}
-        alt="text_1"
-        width={970}
-        height={250}
-        className="text"
-        style={{ opacity: visibleTextClass === "text_1" ? 1 : 0 }}
-      />
-      <img
-        src={text_2}
-        alt="text_2"
-        width={970}
-        height={250}
-        className="text"
-        style={{ opacity: visibleTextClass === "text_2" ? 1 : 0 }}
-      />
-      <img
-        src={text_3}
-        alt="text_3"
-        width={970}
-        height={250}
-        className="text"
-        style={{ opacity: visibleTextClass === "text_3" ? 1 : 0 }}
-      />
-      <img
-        src={text_4}
-        alt="text_4"
-        width={970}
-        height={250}
-        className="text"
-        style={{ opacity: visibleTextClass === "text_4" ? 1 : 0 }}
-      />
+      <div className="text" ref={textRef} />
       <img
         src={cta}
         alt="cta"
@@ -321,14 +319,8 @@ export const App = () => {
         style={{ opacity: isVisibleCta ? 1 : 0 }}
       />
 
-      <div
-        className="phone-container"
-        style={{ transform: phoneContainerTransform }}
-      >
-        <div
-          className="phone_sprite"
-          style={{ backgroundPositionY: phoneSpriteBackgroundPositionY }}
-        />
+      <div className="phone-container" ref={phoneContainerRef}>
+        <div className="phone_sprite" ref={phoneSpriteRef} />
         <img
           src={highlights_970x250}
           alt="highlights_970x250"
@@ -345,7 +337,6 @@ export const App = () => {
           height={202}
           muted
           playing={playing}
-          controls
           loop
           onReady={onPlayerReady}
         />
@@ -360,14 +351,12 @@ export const App = () => {
           />
         ))}
       </div>
-      <div ref={flashRef} className={classNames({ flash: hasFlash.current })} />
+      <div ref={flashRef} className={classNames({ flash: hasFlash })} />
 
       <div
-        className="internals-container"
-        style={{
-          opacity: isVisibleInternalsContainer ? 1 : 0,
-          transition: isVisibleInternalsContainer ? "1s ease" : "0s ease",
-        }}
+        className={classNames("internals-container", {
+          visible: isVisibleInternalsContainer,
+        })}
       >
         <img
           src={internals}

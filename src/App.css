@@ -49,8 +49,10 @@
   position: absolute;
   top: 0px;
   left: 0px;
+  width: var(--banner-width);
+  height: var(--banner-height);
   transition: 0.3s ease;
-  pointer-events: none;
+  opacity: 0;
 }
 
 .close {
@@ -93,7 +95,6 @@
   height: 221px;
   background-image: url(assets/img-webp/phone_sprite.webp);
   background-position-y: 0;
-  pointer-events: none;
   will-change: background-position-y;
 }
 
@@ -101,7 +102,7 @@
   position: absolute;
   top: 0px;
   left: 0px;
-  z-index: 2;
+  z-index: 1;
 }
 
 .flash {
@@ -111,7 +112,6 @@
   width: 300px;
   height: 300px;
   background-image: url(assets/img-webp/flash.webp);
-  pointer-events: none;
 }
 
 .internals_frame {
@@ -127,7 +127,7 @@
   left: -152px;
   width: 144px;
   height: 108px;
-  background-image: url(assets/img/card_highlight.png);
+  background-image: url(assets/img-webp/card_highlight.webp);
   /* background-color: #00f; */
 }
 
@@ -135,7 +135,6 @@
   position: absolute;
   top: 0px;
   left: 0px;
-  pointer-events: none;
 }
 
 .internals-container {
@@ -144,6 +143,13 @@
   left: 0px;
   width: var(--banner-width);
   height: var(--banner-height);
+  opacity: 0;
+  pointer-events: none;
+
+  &.visible {
+    opacity: 1;
+    transition: 1s ease;
+  }
 }
 
 .yt-player {
@@ -166,8 +172,6 @@
   position: absolute;
   top: 0px;
   left: 370px;
-
-  pointer-events: none;
   /* transition: 1s ease; */
 }
 
@@ -176,7 +180,7 @@
   width: 30px;
   height: 28px;
   /* background-color: red; */
-  background-image: url(assets/img/raindrop_1.png);
+  background-image: url(assets/img-webp/raindrop_1.webp);
 }
 
 .raindrop_2 {
@@ -184,7 +188,7 @@
   width: 15px;
   height: 23px;
   /* background-color: yellow; */
-  background-image: url(assets/img/raindrop_2.png);
+  background-image: url(assets/img-webp/raindrop_2.webp);
 }
 
 .raindrop_3 {
@@ -192,7 +196,7 @@
   width: 22px;
   height: 19px;
   /* background-color: blue; */
-  background-image: url(assets/img/raindrop_3.png);
+  background-image: url(assets/img-webp/raindrop_3.webp);
 }
 
 .raindrop_4 {
@@ -200,7 +204,7 @@
   width: 15px;
   height: 24px;
   /* background-color: black; */
-  background-image: url(assets/img/raindrop_4.png);
+  background-image: url(assets/img-webp/raindrop_4.webp);
 }
 
 .followTo {
@@ -211,6 +215,5 @@
   height: var(--banner-height);
   opacity: 0;
   cursor: pointer;
-  pointer-events: all;
   z-index: 1;
 }
