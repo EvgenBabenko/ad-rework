@@ -5,12 +5,14 @@ export class RainDrop {
   id: string = "";
   className: string = "";
   scale: number = 0;
+  scaleEnd: number = 0;
   opacity: number = 0;
   translateX: number = 0;
   translateY: number = 0;
   active: boolean = false;
   slipDownSpeed: number = 0;
-  weight: number = 0;
+  dropDownSpeed: number = 0;
+  hasLanded: boolean = false;
 
   constructor() {
     this.reset();
@@ -19,13 +21,15 @@ export class RainDrop {
   reset() {
     this.id = Math.random().toString(36).slice(2);
     this.className = "raindrop_" + Math.floor(this.random(1, 4));
-    this.scale = this.random(5, 7);
+    this.scale = this.random(5, 15);
+    this.scaleEnd = this.random(0.3, 0.9);
     this.opacity = 0;
-    this.translateX = this.random(0, 470);
+    this.translateX = this.random(0, 360);
     this.translateY = this.random(0, 200);
     this.active = true;
     this.slipDownSpeed = this.random(1, 6);
-    this.weight = 1;
+    this.dropDownSpeed = this.random(1.2, 2.5);
+    this.hasLanded = false;
   }
 
   getStyle() {
@@ -40,15 +44,18 @@ export class RainDrop {
   update() {
     if (!this.active) return;
 
-    // this is falling down
-    if (this.scale > 1) {
-      this.scale -= 1.5;
-      this.opacity = Math.min(this.opacity + 0.1, 1);
-    } else {
-      this.opacity = 1;
+    // drop down
+    if (!this.hasLanded) {
+      this.scale = Math.max(this.scale - this.dropDownSpeed, this.scaleEnd);
+      this.opacity = Math.min(this.opacity + 0.15, 1);
+
+      if (this.scale === this.scaleEnd) {
+        this.opacity = 1;
+        this.hasLanded = true;
+      }
     }
 
-    // this is sliding
+    // slip down
     this.translateY += this.slipDownSpeed;
 
     if (this.translateY >= 250) {
