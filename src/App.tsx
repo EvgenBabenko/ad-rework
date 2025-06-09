@@ -72,11 +72,18 @@ export const App = () => {
   const dropsRef = useRef<RainDrop[]>([]);
   const lastSpawnTime = useRef(0);
   const [isRaining, setIsRaining] = useState(false);
+  const rainTimeoutRef = useRef(0);
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     return () => {
-      clearTimeout(cardHighlighID.current);
+      if (cardHighlighID.current) {
+        clearTimeout(cardHighlighID.current);
+      }
+
+      if (rainTimeoutRef.current) {
+        clearTimeout(rainTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -118,22 +125,27 @@ export const App = () => {
     setIsVisibleInternalsContainer(false);
     setIsVisibleHighlights_970x250(false);
     setIsRaining(false);
+    setPlaying(false);
 
     if (value === 0) {
       setPlaying(true);
       setIsVisibleHighlights_970x250(true);
     }
 
-    if (value >= 1) {
-      setPlaying(false);
-    }
-
     if (value >= 3 && value < 22) {
       if (textRef.current) {
         textRef.current.style.backgroundImage = `url(${text_2})`;
       }
+
       setIsRaining(true);
-      // setInterval(() => setIsRaining(false), 10_000);
+
+      if (rainTimeoutRef.current) {
+        clearTimeout(rainTimeoutRef.current);
+      }
+
+      rainTimeoutRef.current = setTimeout(() => {
+        setIsRaining(false);
+      }, 5_000);
     }
 
     if (value >= 22 && value < 45) {

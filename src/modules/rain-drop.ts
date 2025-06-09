@@ -22,13 +22,13 @@ export class RainDrop {
     this.id = Math.random().toString(36).slice(2);
     this.className = "raindrop_" + Math.floor(this.random(1, 4));
     this.scale = this.random(5, 15);
-    this.scaleEnd = this.random(0.3, 0.9);
+    this.scaleEnd = this.random(0.2, 0.9);
     this.opacity = 0;
     this.translateX = this.random(0, 360);
     this.translateY = this.random(0, 200);
     this.active = true;
-    this.slipDownSpeed = this.random(1, 6);
-    this.dropDownSpeed = this.random(1.2, 2.5);
+    this.slipDownSpeed = this.random(1, 5);
+    this.dropDownSpeed = this.random(1.9, 3.5);
     this.hasLanded = false;
   }
 
