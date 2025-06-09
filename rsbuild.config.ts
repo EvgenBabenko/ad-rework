@@ -7,4 +7,7 @@ export default defineConfig({
   html: {
     template: "./src/index.html",
   },
+  output: {
+    assetPrefix: "/ad-rework/",
+  },
 });
