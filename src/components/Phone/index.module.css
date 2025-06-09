@@ -1,0 +1,27 @@
+.phone-container {
+  transform: translateY(var(--banner-height));
+}
+
+.phone_sprite {
+  position: absolute;
+  top: 14px;
+  left: 292px;
+  width: 514px;
+  height: 221px;
+  background-image: url(assets/img-webp/phone_sprite.webp);
+  background-position-y: 0;
+  will-change: background-position-y;
+}
+
+.highlights_970x250 {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 1;
+}
+
+.yt-player {
+  position: absolute;
+  top: 24px;
+  left: 369px;
+}

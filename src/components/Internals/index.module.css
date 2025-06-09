@@ -1,0 +1,47 @@
+.internals-container {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: var(--banner-width);
+  height: var(--banner-height);
+  opacity: 0;
+  pointer-events: none;
+
+  &.visible {
+    opacity: 1;
+    transition: 1s ease;
+  }
+}
+
+.internals {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+.internals_frame {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 1;
+}
+
+.card-highlight-container {
+  position: relative;
+  top: 154px;
+  left: 370px;
+  width: 50px;
+  height: 40px;
+  /* background-color: red; */
+  overflow: hidden;
+}
+
+.card_highlight {
+  position: absolute;
+  top: -25px;
+  left: -152px;
+  width: 144px;
+  height: 108px;
+  background-image: url(assets/img-webp/card_highlight.webp);
+  /* background-color: #00f; */
+}
