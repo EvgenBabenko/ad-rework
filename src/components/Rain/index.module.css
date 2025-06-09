@@ -1,0 +1,38 @@
+.rain {
+  position: absolute;
+  top: 0px;
+  left: 370px;
+  /* transition: 1s ease; */
+}
+
+.raindrop_1 {
+  position: absolute;
+  width: 30px;
+  height: 28px;
+  /* background-color: red; */
+  background-image: url(assets/img-webp/raindrop_1.webp);
+}
+
+.raindrop_2 {
+  position: absolute;
+  width: 15px;
+  height: 23px;
+  /* background-color: yellow; */
+  background-image: url(assets/img-webp/raindrop_2.webp);
+}
+
+.raindrop_3 {
+  position: absolute;
+  width: 22px;
+  height: 19px;
+  /* background-color: blue; */
+  background-image: url(assets/img-webp/raindrop_3.webp);
+}
+
+.raindrop_4 {
+  position: absolute;
+  width: 15px;
+  height: 24px;
+  /* background-color: black; */
+  background-image: url(assets/img-webp/raindrop_4.webp);
+}

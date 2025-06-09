@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import ReactPlayer from "react-player/youtube";
-import "./App.css";
+import React, { lazy, useEffect, useRef, useState, Suspense } from "react";
+import s from "./App.module.css";
 import text_1 from "assets/img-webp/text_1.webp?url";
 import text_2 from "assets/img-webp/text_2.webp?url";
 import text_3 from "assets/img-webp/text_3.webp?url";
@@ -9,15 +8,26 @@ import closeImage from "assets/img-webp/close_black.webp?url";
 import logo from "assets/img-webp/logo.webp?url";
 import loading from "assets/img-webp/loading.webp?url";
 import slider_text from "assets/img-webp/slider_text.webp?url";
-import highlights_970x250 from "assets/img-webp/970x250_highlights.webp?url";
 import cta from "assets/img-webp/cta.webp?url";
-import internals_frame from "assets/img-webp/internals_frame.webp?url";
-import internals from "assets/img-webp/internals.webp?url";
 import flash from "assets/img-webp/flash.webp?url";
 import { RainDrop } from "modules/rain-drop";
 import { delay } from "utils/delay";
 import { preload } from "react-dom";
 import classNames from "classnames";
+
+const Rain = lazy(() =>
+  import("./components/Rain/Rain").then((module) => ({ default: module.Rain }))
+);
+const Internals = lazy(() =>
+  import("./components/Internals/Internals").then((module) => ({
+    default: module.Internals,
+  }))
+);
+const Phone = lazy(() =>
+  import("./components/Phone/Phone").then((module) => ({
+    default: module.Phone,
+  }))
+);
 
 const animationProgress = (start: number, end: number, duration: number) => {
   let startTime = 0;
@@ -307,99 +317,70 @@ export const App = () => {
   };
 
   return (
-    <div className="main" ref={mainRef}>
+    <div className={s["main"]} ref={mainRef}>
       <img
         src={loading}
         alt="loading"
         width={970}
         height={250}
-        className="loading"
+        className={s["loading"]}
       />
-      <div className="close" onClick={close}>
+      <div className={s["close"]} onClick={close}>
         <span>Close Ad</span>
         <img src={closeImage} alt="close" width={25} height={25} />
       </div>
-      <div className="followTo" onClick={followTo} />
-      <img src={logo} alt="logo" width={970} height={250} className="logo" />
-      <div className="text" ref={textRef} />
+      <div className={s["followTo"]} onClick={followTo} />
+      <img
+        src={logo}
+        alt="logo"
+        width={970}
+        height={250}
+        className={s["logo"]}
+      />
+      <div className={s["text"]} ref={textRef} />
       <img
         src={cta}
         alt="cta"
         width={970}
         height={250}
-        className="cta"
+        className={s["cta"]}
         style={{ opacity: isVisibleCta ? 1 : 0 }}
       />
 
-      <div className="phone-container" ref={phoneContainerRef}>
-        <div className="phone_sprite" ref={phoneSpriteRef} />
-        <img
-          src={highlights_970x250}
-          alt="highlights_970x250"
-          width={970}
-          height={250}
-          className="highlights_970x250"
-          style={{ opacity: isVisibleHighlights_970x250 ? 1 : 0 }}
-        />
-        <ReactPlayer
-          url="https://www.youtube.com/watch?v=v4mckcfr4c0&ab_channel=SamsungPhilippines"
-          className="yt-player"
-          style={{ opacity: playing ? "1" : "0" }}
-          width={363}
-          height={202}
-          muted
+      <Suspense fallback={null}>
+        <Phone
           playing={playing}
-          loop
-          onReady={onPlayerReady}
+          onPlayerReady={onPlayerReady}
+          isVisibleHighlights_970x250={isVisibleHighlights_970x250}
+          phoneContainerRef={phoneContainerRef}
+          phoneSpriteRef={phoneSpriteRef}
         />
-      </div>
+      </Suspense>
 
-      <div className="rain">
-        {drops.map((drop) => (
-          <div
-            key={drop.id}
-            className={drop.className}
-            style={drop.getStyle()}
-          />
-        ))}
-      </div>
-      <div ref={flashRef} className={classNames({ flash: hasFlash })} />
+      <Suspense fallback={null}>
+        <Rain drops={drops} />
+      </Suspense>
 
-      <div
-        className={classNames("internals-container", {
-          visible: isVisibleInternalsContainer,
-        })}
-      >
-        <img
-          src={internals}
-          alt="internals"
-          width={970}
-          height={250}
-          className="internals"
+      <div ref={flashRef} className={classNames({ [s["flash"]]: hasFlash })} />
+
+      <Suspense>
+        <Internals
+          isVisible={isVisibleInternalsContainer}
+          cardHighlightRef={cardHighlightRef}
         />
-        <img
-          src={internals_frame}
-          alt="internals_frame"
-          width={970}
-          height={250}
-          className="internals_frame"
-        />
-        <div className="card-highlight-container">
-          <div className="card_highlight" ref={cardHighlightRef} />
-        </div>
-      </div>
+      </Suspense>
 
       <img
         src={slider_text}
         alt="slider_text"
         width={970}
         height={250}
-        className="slider_text"
+        className={s["slider_text"]}
         style={{ opacity: isVisibleSliderText ? 1 : 0 }}
       />
       <input
         ref={sliderRef}
-        className="slider"
+        className={s["slider"]}
         aria-label="slider"
         type="range"
         min="0"
