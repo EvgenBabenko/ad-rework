@@ -1,5 +1,11 @@
 # Rsbuild project
 
+This is full rework of https://github.com/EvgenBabenko/ad
+
+## Live Demo
+
+https://evgenbabenko.github.io/ad-rework/
+
 ## Setup
 
 Install the dependencies:
